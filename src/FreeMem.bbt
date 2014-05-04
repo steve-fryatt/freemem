@@ -1,0 +1,162 @@
+REM >!RunImage
+REM
+REM Free Memory Display
+REM
+REM (c) Stephen Fryatt, 1998
+REM 0.02 (14 July 1998)
+:
+LIBRARY "BASIC:WimpLib"
+:
+ON ERROR SYS "Hourglass_Smash" : PRINT TAB(0,0) REPORT$+" at line "+STR$(ERL) : END
+:
+PROCinitialise
+:
+ON ERROR IF FNerror(task_name$)=2 THEN quit%=TRUE
+:
+WHILE NOT quit%
+ PROCpoll
+ENDWHILE
+:
+SYS "Wimp_CloseDown"
+:
+END
+:
+:
+:
+:
+:
+DEF PROCinitialise
+:
+LOCAL ind_size%, ind_area%, pages%, bytes%
+:
+SYS "Hourglass_On"
+:
+REM Initialise the WIMP.
+:
+quit%=FALSE
+DIM a% 256, b% 256, q% 256
+task_name$="Free Memory"
+!q%=&400C1
+q%!4=0
+SYS "Wimp_Initialise",350,&4B534154,task_name$,q%
+:
+REM Load the templates.
+:
+ind_size%=4
+DIM ind_area% ind_size%
+:
+PROCopen_templates("<FreeMem$Dir>.Templates")
+PROCload_template("Memory",b%,ind_area%,ind_size%,-1)
+SYS "Wimp_CreateWindow",,b% TO memory_window%
+PROCclose_templates
+:
+REM Find out how much RAM is in the machine (DRAM + VRAM) and set up the bar.
+:
+SYS "OS_Memory",&0108 TO ,pages%,bytes%
+maximum_memory%=pages%*bytes%
+SYS "OS_Memory",&0208 TO ,pages%,bytes%
+maximum_memory%+=pages%*bytes%
+:
+free_memory%=maximum_memory%
+bar_length%=maximum_memory%
+changing_size%=FALSE
+:
+REM Get the current screen size and open the window.
+:
+mode_height%=FNmode_height
+!b%=memory_window%
+SYS "Wimp_GetWindowState",,b%
+PROCopen_memory_window
+:
+SYS "Hourglass_Off"
+:
+ENDPROC
+:
+:
+:
+:
+DEF PROCpoll
+SYS "OS_ReadMonotonicTime" TO time%
+IF changing_size% THEN time%+=2 ELSE time%+=100
+SYS "Wimp_PollIdle",0,b%,time% TO reason%
+:
+CASE reason% OF
+ WHEN 0     : PROCread_free_memory
+              IF changing_size% THEN PROCupdate_free_memory
+ WHEN 2     : PROCopen_memory_window
+ WHEN 3     : SYS "Wimp_CloseWindow",,b%
+ WHEN 17,18 : CASE b%!16 OF
+               WHEN 0      : quit%=TRUE
+               WHEN &400C1 : mode_height%=FNmode_height
+              ENDCASE
+ENDCASE
+ENDPROC
+:
+:
+:
+:
+DEF PROCopen_memory_window
+b%!12=(b%!12-b%!4)
+b%!4=0
+b%!8=mode_height%-(b%!16-b%!8)
+b%!16=mode_height%
+b%!28=-2
+SYS "Wimp_OpenWindow",,b%
+ENDPROC
+:
+:
+:
+:
+DEF PROCread_free_memory
+:
+LOCAL new_free%
+:
+SYS "Wimp_SlotSize",-1,-1 TO ,,new_free%
+IF free_memory%<>new_free% THEN
+ changing_size%=TRUE
+ free_memory%=new_free%
+ SYS "OS_ReadMonotonicTime" TO last_changed_at%
+ENDIF
+ENDPROC
+:
+:
+:
+:
+DEF PROCupdate_free_memory
+:
+LOCAL direction%,icon_width%,current_time%
+:
+SYS "OS_ReadMonotonicTime" TO current_time%
+:
+direction%=SGN(free_memory%-bar_length%)
+:
+bar_length%+=16384*((current_time%-last_changed_at%)/2)*direction%
+CASE direction% OF
+ WHEN -1 : IF bar_length%<free_memory% THEN bar_length%=free_memory% : changing_size%=FALSE
+ WHEN  0 : changing_size%=FALSE
+ WHEN  1 : IF bar_length%>free_memory% THEN bar_length%=free_memory% : changing_size%=FALSE
+ENDCASE
+:
+last_changed_at%=current_time%
+:
+REM Change the size of the bar appropriately.
+:
+!q%=memory_window%
+q%!4=1
+SYS "Wimp_GetIconState",,q%
+:
+icon_width%=INT((bar_length%/maximum_memory%)*(q%!16-q%!8))
+:
+SYS "Wimp_ResizeIcon",memory_window%,2,q%!8,q%!12,q%!8+icon_width%,q%!20
+WAIT
+PROCforce_icon_redraw(memory_window%,1)
+ENDPROC
+:
+:
+:
+:
+DEF FNmode_height
+LOCAL m%,n%
+SYS "OS_ReadModeVariable",-1,12 TO ,,m%
+SYS "OS_ReadModeVariable",-1,5  TO ,,n%
+=m%<<n%

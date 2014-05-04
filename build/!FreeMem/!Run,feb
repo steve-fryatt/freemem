@@ -1,0 +1,5 @@
+Set FreeMem$Dir <Obey$Dir>
+
+WimpSlot -min 8K -max 8K
+
+Run <FreeMem$Dir>.!RunImage
