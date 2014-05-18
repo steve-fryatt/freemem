@@ -1,6 +1,6 @@
 # Copyright 2014, Stephen Fryatt (info@stevefryatt.org.uk)
 #
-# This file is part of FReeMem:
+# This file is part of FreeMem:
 #
 #   http://www.stevefryatt.org.uk/software/
 #
@@ -77,7 +77,7 @@ ZIPFLAGS := -x "*/.svn/*" -r -, -9
 SRCZIPFLAGS := -x "*/.svn/*" -r -9
 BUZIPFLAGS := -x "*/.svn/*" -r -9
 BINDHELPFLAGS := -f -r -v
-TOKFLAGS := -verbose -crunch EIrW
+TOKFLAGS := -verbose -crunch EIrW -swi -swis $(GCCSDK_INSTALL_CROSSBIN)/../arm-unknown-riscos/include/swis.h -swis $(GCCSDK_INSTALL_ENV)/include/TokSWIs.h
 
 
 # Set up the various build directories.
