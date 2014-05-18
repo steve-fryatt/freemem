@@ -24,6 +24,6 @@
 
 Set FreeMem$Dir <Obey$Dir>
 
-WimpSlot -min 8K -max 8K
+WimpSlot -min 32K -max 32K
 
 Run <FreeMem$Dir>.!RunImage
