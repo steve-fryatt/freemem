@@ -25,6 +25,7 @@ REM permissions and limitations under the Licence.
 REM Free Memory Display
 :
 LIBRARY "BASIC:WimpLib"
+LIBRARY "BASIC:Icon"
 :
 ON ERROR SYS "Hourglass_Smash" : PRINT TAB(0,0) REPORT$+" at line "+STR$(ERL) : END
 :
@@ -168,7 +169,7 @@ icon_width%=INT((bar_length%/maximum_memory%)*(q%!16-q%!8))
 :
 SYS "Wimp_ResizeIcon",memory_window%,2,q%!8,q%!12,q%!8+icon_width%,q%!20
 WAIT
-PROCforce_icon_redraw(memory_window%,1)
+PROCicon_redraw(memory_window%,1)
 ENDPROC
 :
 :
