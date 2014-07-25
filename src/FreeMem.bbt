@@ -26,6 +26,7 @@ REM Free Memory Display
 :
 LIBRARY "BASIC:WimpLib"
 LIBRARY "BASIC:Icon"
+LIBRARY "BASIC:Template"
 :
 ON ERROR SYS "Hourglass_Smash" : PRINT TAB(0,0) REPORT$+" at line "+STR$(ERL) : END
 :
@@ -65,10 +66,10 @@ REM Load the templates.
 ind_size%=4
 DIM ind_area% ind_size%
 :
-PROCopen_templates("<FreeMem$Dir>.Templates")
-PROCload_template("Memory",b%,ind_area%,ind_size%,-1)
+PROCtemplate_open("<FreeMem$Dir>.Templates")
+PROCtemplate_load("Memory",b%,ind_area%,ind_size%,-1)
 SYS "Wimp_CreateWindow",,b% TO memory_window%
-PROCclose_templates
+PROCtemplate_close
 :
 REM Find out how much RAM is in the machine (DRAM + VRAM) and set up the bar.
 :
