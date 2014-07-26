@@ -27,12 +27,14 @@ REM Free Memory Display
 LIBRARY "BASIC:WimpLib"
 LIBRARY "BASIC:Icon"
 LIBRARY "BASIC:Template"
+LIBRARY "BASIC:WimpError"
 :
-ON ERROR SYS "Hourglass_Smash" : PRINT TAB(0,0) REPORT$+" at line "+STR$(ERL) : END
+PROCwimperror_initialise("FreeMem", "")
+ON ERROR ON ERROR result% = FNwimperror_program : END
 :
 PROCinitialise
 :
-ON ERROR IF FNerror(task_name$)=2 THEN quit%=TRUE
+ON ERROR quit% = FNwimperror_program
 :
 WHILE NOT quit%
  PROCpoll
@@ -88,6 +90,8 @@ mode_height%=FNmode_height
 !b%=memory_window%
 SYS "Wimp_GetWindowState",,b%
 PROCopen_memory_window
+:
+PROCwimperror_initialise(task_name$, "")
 :
 SYS "Hourglass_Off"
 :
