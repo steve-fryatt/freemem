@@ -24,7 +24,6 @@ REM permissions and limitations under the Licence.
 :
 REM Free Memory Display
 :
-LIBRARY "BASIC:WimpLib"
 LIBRARY "BASIC:Icon"
 LIBRARY "BASIC:Template"
 LIBRARY "BASIC:WimpError"
