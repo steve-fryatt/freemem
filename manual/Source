@@ -20,7 +20,7 @@ FreeMem - Free memory display                                    Version $$versi
 
 <chapter title="License" file="License">
 
-<cite>FreeMem</cite> is licensed under the EUPL, Version&nbsp;1.1 only (the &ldquo;Licence&rdquo;); you may not use this work except in compliance with the Licence.
+<cite>FreeMem</cite> is licensed under the EUPL, Version&nbsp;1.2 only (the &ldquo;Licence&rdquo;); you may not use this work except in compliance with the Licence.
 
 You may obtain a copy of the Licence at <link ref="#url http://joinup.ec.europa.eu/software/page/eupl">http://joinup.ec.europa.eu/software/page/eupl</link>
 
@@ -78,6 +78,6 @@ Updates and Contacting Me
   on my website at http://www.stevefryatt.org.uk/software/
 
   Stephen Fryatt
-  email: steve@stevefryatt.org.uk
+  email: info@stevefryatt.org.uk
 </literal>
 

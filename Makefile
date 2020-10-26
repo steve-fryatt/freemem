@@ -1,10 +1,10 @@
-# Copyright 2014, Stephen Fryatt (info@stevefryatt.org.uk)
+# Copyright 2014-2020, Stephen Fryatt (info@stevefryatt.org.uk)
 #
 # This file is part of FreeMem:
 #
 #   http://www.stevefryatt.org.uk/software/
 #
-# Licensed under the EUPL, Version 1.1 only (the "Licence");
+# Licensed under the EUPL, Version 1.2 only (the "Licence");
 # You may not use this work except in compliance with the
 # Licence.
 #
@@ -93,13 +93,14 @@ APP := !FreeMem
 RUNIMAGE := !RunImage,ffb
 README := ReadMe,fff
 TEXTHELP := !Help,fff
-LICENSE := Licence,fff
+LICENCE := Licence,fff
 
 
 # Set up the source files.
 
 MANSRC := Source
 READMEHDR := Header
+LICSRC ?= Licence
 
 SRCS := FreeMem.bbt
 
@@ -112,30 +113,37 @@ all: application documentation
 
 application: $(OUTDIR)/$(APP)/$(RUNIMAGE) $(OUTDIR)/$(APP)/$(UKRES)/$(MENUS)
 
+# Create the output folder if it doesn't exist.
+
+$(OUTDIR):
+	$(MKDIR) $(OUTDIR)
 
 # Build the complete !RunImage from the object files.
 
 SRCS := $(addprefix $(SRCDIR)/, $(SRCS))
 
-$(OUTDIR)/$(APP)/$(RUNIMAGE): $(SRCS)
+$(OUTDIR)/$(APP)/$(RUNIMAGE): $(SRCS) $(OUTDIR)
 	$(TOKENIZE) $(TOKFLAGS) $(firstword $(SRCS)) -link -out $(OUTDIR)/$(APP)/$(RUNIMAGE) -path $(LIBPATHS) -define 'build_date$$=$(BUILD_DATE)' -define 'build_version$$=$(VERSION)'
 
 
 # Build the documentation
 
-documentation: $(OUTDIR)/$(APP)/$(TEXTHELP) $(OUTDIR)/$(README)
+documentation: $(OUTDIR)/$(APP)/$(TEXTHELP) $(OUTDIR)/$(README) $(OUTDIR)/$(LICENCE)
 
-$(OUTDIR)/$(APP)/$(TEXTHELP): $(MANUAL)/$(MANSRC)
+$(OUTDIR)/$(APP)/$(TEXTHELP): $(MANUAL)/$(MANSRC) $(OUTDIR)
 	$(MANTOOLS) -MTEXT -I$(MANUAL)/$(MANSRC) -O$(OUTDIR)/$(APP)/$(TEXTHELP) -D'version=$(HELP_VERSION)' -D'date=$(HELP_DATE)'
 
-$(OUTDIR)/$(README): $(OUTDIR)/$(APP)/$(TEXTHELP) $(MANUAL)/$(READMEHDR)
+$(OUTDIR)/$(README): $(OUTDIR)/$(APP)/$(TEXTHELP) $(MANUAL)/$(READMEHDR) $(OUTDIR)
 	$(TEXTMERGE) $(OUTDIR)/$(README) $(OUTDIR)/$(APP)/$(TEXTHELP) $(MANUAL)/$(READMEHDR) 5
+
+$(OUTDIR)/$(LICENCE): $(LICSRC) $(OUTDIR)
+	$(CP) $(LICSRC) $(OUTDIR)/$(LICENCE)
 
 # Build the release Zip file.
 
 release: clean all
 	$(RM) ../$(ZIPFILE)
-	(cd $(OUTDIR) ; $(ZIP) $(ZIPFLAGS) ../../$(ZIPFILE) $(APP) $(README) $(LICENSE))
+	(cd $(OUTDIR) ; $(ZIP) $(ZIPFLAGS) ../../$(ZIPFILE) $(APP) $(README) $(LICENCE))
 	$(RM) ../$(SRCZIPFILE)
 	$(ZIP) $(SRCZIPFLAGS) ../$(SRCZIPFILE) $(OUTDIR) $(SRCDIR) $(MANUAL) Makefile
 
@@ -153,4 +161,5 @@ clean:
 	$(RM) $(OUTDIR)/$(APP)/$(RUNIMAGE)
 	$(RM) $(OUTDIR)/$(APP)/$(TEXTHELP)
 	$(RM) $(OUTDIR)/$(README)
+	$(RM) $(OUTDIR)/$(LICENCE)
 
